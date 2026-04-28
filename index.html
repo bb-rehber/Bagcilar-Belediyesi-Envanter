@@ -2,155 +2,99 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BT Envanter & Taahhüt Takip Sistemi</title>
+    <title>BT Envanter Dashboard</title>
     <style>
-        :root { --primary: #2c3e50; --secondary: #3498db; --success: #27ae60; --danger: #e74c3c; --warning: #f1c40f; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; margin: 0; padding: 20px; }
-        .container { max-width: 1400px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
-        header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #eee; padding-bottom: 15px; margin-bottom: 20px; }
+        :root { --primary: #2c3e50; --accent: #2980b9; --success: #27ae60; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; padding: 20px; }
+        .container { max-width: 1100px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         
-        .search-box { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 6px; font-size: 16px; margin-bottom: 20px; }
-        
-        table { width: 100%; border-collapse: collapse; background: white; }
-        th { background: var(--primary); color: white; padding: 12px; text-align: left; position: sticky; top: 0; }
-        td { padding: 12px; border-bottom: 1px solid #eee; font-size: 14px; }
-        tr:hover { background: #f9f9f9; }
+        /* Tablo Tasarımı */
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th { background: var(--primary); color: white; padding: 12px; text-align: left; font-size: 13px; text-transform: uppercase; }
+        td { padding: 15px; border-bottom: 1px solid #eee; font-size: 14px; cursor: pointer; }
+        tr:hover { background: #f1f9ff; transition: 0.2s; }
 
-        .badge { padding: 4px 8px; border-radius: 4px; color: white; font-size: 11px; font-weight: bold; text-transform: uppercase; }
-        .bg-aktif { background: var(--success); }
-        .bg-pasif { background: #95a5a6; }
+        /* Kart (Modal) Tasarımı */
+        .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
+        .modal-content { background: white; margin: 12% auto; padding: 25px; width: 400px; border-radius: 10px; box-shadow: 0 5px 30px rgba(0,0,0,0.3); animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from {opacity: 0; transform: translateY(-20px);} to {opacity: 1; transform: translateY(0);} }
         
-        .taahhut-warning { background-color: #fff3cd !important; border-left: 5px solid var(--warning); }
-        .taahhut-danger { background-color: #f8d7da !important; border-left: 5px solid var(--danger); }
+        .card-header { border-bottom: 2px solid var(--accent); padding-bottom: 10px; margin-bottom: 15px; font-weight: bold; font-size: 18px; color: var(--primary); }
+        .detail-row { margin-bottom: 10px; display: flex; justify-content: space-between; border-bottom: 1px dashed #eee; padding-bottom: 5px; }
+        .detail-label { color: #7f8c8d; font-size: 12px; }
+        .detail-value { font-weight: bold; color: #333; }
         
-        .ip-link { color: var(--secondary); text-decoration: none; font-weight: bold; border-bottom: 1px dashed var(--secondary); }
-        .copy-btn { cursor: pointer; margin-left: 5px; font-size: 12px; color: #777; border: 1px solid #ddd; padding: 2px 5px; border-radius: 3px; background: #eee; }
-        
-        .admin-controls { display: none; margin-top: 10px; }
-        .admin-only { display: none; } /* Admin modu kapalıyken gizle */
-        
-        #loginBtn { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; }
-        .btn-add { background: var(--success); color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; margin-bottom: 10px; }
-        .btn-delete { background: var(--danger); color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; }
+        .close-btn { background: var(--primary); color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; float: right; margin-top: 10px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <header>
-        <div>
-            <h1 style="margin:0; color: var(--primary);">🌐 Kurum Envanter Rehberi</h1>
-            <small id="currentDateDisplay"></small>
-        </div>
-        <button id="loginBtn" onclick="toggleAdmin()">🔒 Yönetici Girişi</button>
-    </header>
-
-    <div class="admin-controls" id="adminHeader">
-        <button class="btn-add">➕ Yeni Kayıt Ekle</button>
-        <span style="color: var(--danger); font-weight: bold; margin-left: 15px;">Yönetici Modu Aktif (Ekle/Sil Yetkisi Açık)</span>
-    </div>
-
-    <input type="text" id="searchInput" class="search-box" placeholder="Mahalle, Birim, Devre No veya İp Ara..." onkeyup="searchTable()">
-
-    <table id="inventoryTable">
+    <h2 style="color: var(--primary);">📡 IT Bağlantı Rehberi</h2>
+    
+    <table>
         <thead>
             <tr>
-                <th>MAHALLE / ADRES</th>
-                <th>SERVİS / HIZ</th>
-                <th>DIŞ IP (Tıkla)</th>
-                <th>ŞİFRELER</th>
-                <th>TAAHHÜT BİTİŞ</th>
-                <th>DURUM</th>
-                <th class="admin-only">İŞLEM</th>
+                <th>BİRİM / MAHALLE</th>
+                <th>DIŞ IP</th>
+                <th>SERVİS SAĞLAYICI</th>
+                <th>DEVRE ADI/NO</th>
             </tr>
         </thead>
         <tbody id="tableBody">
-            <tr data-bitis="2027-04-23">
-                <td><strong>SANCAKTEPE</strong><br><small>960.SOKAK NO 5</small></td>
-                <td>TÜRKNET / ADSL<br><small>100 Mbps</small></td>
-                <td><a href="http://72.16.52.52" target="_blank" class="ip-link">72.16.52.52</a></td>
-                <td>Modem: 123456 <span class="copy-btn" onclick="copyText('123456')">📋</span><br>PPPoE: Pl2024Pl</td>
-                <td>23.04.2027<br><small class="kalan-gun"></small></td>
-                <td><span class="badge bg-aktif">AKTİF</span></td>
-                <td class="admin-only"><button class="btn-delete">Sil</button></td>
+            <tr onclick="openCard('SANCAKTEPE', '960. Sokak No:5', '72.16.52.52', 'TÜRKNET', '152635623', 'Pl2024Pl', '100 Mbps', '23.04.2027')">
+                <td><strong>SANCAKTEPE</strong></td>
+                <td style="color: var(--accent); font-weight: bold;">72.16.52.52</td>
+                <td>TÜRKNET</td>
+                <td>152635623</td>
             </tr>
-            <tr data-bitis="2026-05-10">
-                <td><strong>YENİ MAHALLE</strong><br><small>KOÇMAN CD. NO 74</small></td>
-                <td>SUPERBOX / FİBER<br><small>1000 Mbps</small></td>
-                <td><a href="http://85.62.45.63" target="_blank" class="ip-link">85.62.45.63</a></td>
-                <td>Modem: Pl2024Pl <span class="copy-btn" onclick="copyText('Pl2024Pl')">📋</span></td>
-                <td>10.05.2026<br><small class="kalan-gun"></small></td>
-                <td><span class="badge bg-aktif">AKTİF</span></td>
-                <td class="admin-only"><button class="btn-delete">Sil</button></td>
-            </tr>
-            <tr data-bitis="2028-07-25">
-                <td><strong>BARBAROS</strong><br><small>63.SOKAK NO 65</small></td>
-                <td>TÜRK TELEKOM / VDSL<br><small>50 Mbps</small></td>
-                <td><a href="http://192.168.41.52" target="_blank" class="ip-link">192.168.41.52</a></td>
-                <td>Modem: admin <span class="copy-btn" onclick="copyText('admin')">📋</span></td>
-                <td>25.07.2028<br><small class="kalan-gun"></small></td>
-                <td><span class="badge bg-pasif">PASİF</span></td>
-                <td class="admin-only"><button class="btn-delete">Sil</button></td>
+            <tr onclick="openCard('YAVUZ SELİM', 'Birlik Cd. No:147', '172.16.1.141', 'TÜRK TELEKOM', 'ucanevlerparki...', 'Pl2024Pl', '100/4 Mbps', '04.12.2029')">
+                <td><strong>YAVUZ SELİM</strong></td>
+                <td style="color: var(--accent); font-weight: bold;">172.16.1.141</td>
+                <td>TÜRK TELEKOM</td>
+                <td>ucanevlerparki...</td>
             </tr>
         </tbody>
     </table>
 </div>
 
+<div id="birimModal" class="modal">
+    <div class="modal-content">
+        <div id="c-baslik" class="card-header"></div>
+        
+        <div class="detail-row"><span class="detail-label">ADRES:</span> <span id="c-adres" class="detail-value"></span></div>
+        <div class="detail-row"><span class="detail-label">DIŞ IP:</span> <span id="c-ip" class="detail-value"></span></div>
+        <div class="detail-row"><span class="detail-label">SAĞLAYICI:</span> <span id="c-servis" class="detail-value"></span></div>
+        <div class="detail-row"><span class="detail-label">DEVRE NO:</span> <span id="c-devre" class="detail-value"></span></div>
+        <div class="detail-row"><span class="detail-label">HIZ:</span> <span id="c-hiz" class="detail-value"></span></div>
+        <div class="detail-row"><span class="detail-label">ŞİFRE:</span> <span id="c-sifre" class="detail-value" style="color: var(--success);"></span></div>
+        <div class="detail-row"><span class="detail-label">TAAHHÜT BİTİŞ:</span> <span id="c-tarih" class="detail-value"></span></div>
+        
+        <button class="close-btn" onclick="closeCard()">Kapat</button>
+        <div style="clear:both;"></div>
+    </div>
+</div>
+
 <script>
-    // Bugünün Tarihi (Senin sistemine göre sabitlendi)
-    const T_BUGUN = new Date("2026-04-28");
-    document.getElementById('currentDateDisplay').innerText = "Sistem Tarihi: 28 Nisan 2026";
-
-    // Taahhüt Hesaplama ve Renklendirme
-    function updateDashboard() {
-        const rows = document.querySelectorAll("#tableBody tr");
-        rows.forEach(row => {
-            const bitis = new Date(row.getAttribute("data-bitis"));
-            const farkZamani = bitis - T_BUGUN;
-            const gun = Math.ceil(farkZamani / (1000 * 60 * 60 * 24));
-            
-            const kalanText = row.querySelector(".kalan-gun");
-            if(gun > 0) {
-                kalanText.innerText = gun + " gün kaldı";
-                if(gun <= 30 && gun > 7) row.classList.add("taahhut-warning");
-                if(gun <= 7) row.classList.add("taahhut-danger");
-            } else {
-                kalanText.innerText = "SÜRE DOLDU!";
-                row.classList.add("taahhut-danger");
-            }
-        });
+    function openCard(birim, adres, ip, servis, devre, sifre, hiz, tarih) {
+        document.getElementById('c-baslik').innerText = birim;
+        document.getElementById('c-adres').innerText = adres;
+        document.getElementById('c-ip').innerText = ip;
+        document.getElementById('c-servis').innerText = servis;
+        document.getElementById('c-devre').innerText = devre;
+        document.getElementById('c-sifre').innerText = sifre;
+        document.getElementById('c-hiz').innerText = hiz;
+        document.getElementById('c-tarih').innerText = tarih;
+        document.getElementById('birimModal').style.display = "block";
     }
 
-    // Arama Fonksiyonu
-    function searchTable() {
-        let filter = document.getElementById("searchInput").value.toUpperCase();
-        let rows = document.getElementById("tableBody").getElementsByTagName("tr");
-        for (let i = 0; i < rows.length; i++) {
-            rows[i].style.display = rows[i].innerText.toUpperCase().includes(filter) ? "" : "none";
-        }
+    function closeCard() {
+        document.getElementById('birimModal').style.display = "none";
     }
 
-    // Admin Panelini Aç/Kapat
-    function toggleAdmin() {
-        let sifre = prompt("Yönetici Şifresini Girin:");
-        if(sifre === "1234") { // Burayı kendi şifrenle değiştir
-            document.getElementById("adminHeader").style.display = "block";
-            document.querySelectorAll(".admin-only").forEach(el => el.style.display = "table-cell");
-            document.getElementById("loginBtn").innerText = "🔓 Yönetici Çıkışı";
-            alert("Yönetici modu aktif. Kayıt silebilir veya ekleyebilirsiniz.");
-        } else {
-            alert("Hatalı şifre!");
-        }
+    window.onclick = function(event) {
+        if (event.target == document.getElementById('birimModal')) closeCard();
     }
-
-    // Kopyalama Fonksiyonu
-    function copyText(text) {
-        navigator.clipboard.writeText(text);
-        alert("Kopyalandı: " + text);
-    }
-
-    window.onload = updateDashboard;
 </script>
 
 </body>
