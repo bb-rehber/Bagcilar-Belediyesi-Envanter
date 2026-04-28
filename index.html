@@ -2,57 +2,86 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>BT Envanter Dashboard</title>
+    <title>İnternet Devreleri Envanteri</title>
     <style>
-        :root { --primary: #2c3e50; --accent: #2980b9; --success: #27ae60; }
-        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; padding: 20px; }
-        .container { max-width: 1100px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        :root { --primary: #2c3e50; --accent: #2980b9; --success: #27ae60; --bg: #f8f9fa; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); padding: 20px; color: #333; }
+        .container { max-width: 1200px; margin: auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border-top: 5px solid var(--primary); }
         
-        /* Tablo Tasarımı */
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th { background: var(--primary); color: white; padding: 12px; text-align: left; font-size: 13px; text-transform: uppercase; }
-        td { padding: 15px; border-bottom: 1px solid #eee; font-size: 14px; cursor: pointer; }
-        tr:hover { background: #f1f9ff; transition: 0.2s; }
+        /* Kurumsal Üst Bilgi */
+        .header-area { text-align: center; margin-bottom: 30px; border-bottom: 1px solid #eee; padding-bottom: 20px; }
+        .header-area h1 { margin: 0; color: var(--primary); font-size: 26px; text-transform: uppercase; letter-spacing: 1px; }
+        .header-area h3 { margin: 5px 0 0; color: var(--accent); font-weight: normal; font-size: 16px; }
 
-        /* Kart (Modal) Tasarımı */
-        .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
-        .modal-content { background: white; margin: 12% auto; padding: 25px; width: 400px; border-radius: 10px; box-shadow: 0 5px 30px rgba(0,0,0,0.3); animation: fadeIn 0.3s; }
-        @keyframes fadeIn { from {opacity: 0; transform: translateY(-20px);} to {opacity: 1; transform: translateY(0);} }
-        
-        .card-header { border-bottom: 2px solid var(--accent); padding-bottom: 10px; margin-bottom: 15px; font-weight: bold; font-size: 18px; color: var(--primary); }
-        .detail-row { margin-bottom: 10px; display: flex; justify-content: space-between; border-bottom: 1px dashed #eee; padding-bottom: 5px; }
-        .detail-label { color: #7f8c8d; font-size: 12px; }
-        .detail-value { font-weight: bold; color: #333; }
-        
-        .close-btn { background: var(--primary); color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; float: right; margin-top: 10px; }
+        /* Arama Kutusu */
+        .search-container { margin-bottom: 25px; position: relative; }
+        .search-box {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 30px;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s;
+            background: #fff;
+        }
+        .search-box:focus { border-color: var(--accent); box-shadow: 0 0 10px rgba(41, 128, 185, 0.1); }
+
+        /* Tablo Tasarımı */
+        table { width: 100%; border-collapse: collapse; background: white; }
+        th { background: #f1f3f5; color: #495057; padding: 15px; text-align: left; border: 1px solid #dee2e6; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+        td { padding: 15px; border: 1px solid #dee2e6; font-size: 14px; cursor: pointer; transition: 0.2s; }
+        tr:hover td { background-color: #f8fbff; }
+        .ip-text { color: var(--accent); font-weight: bold; font-family: monospace; }
+
+        /* Birim Kartı (Modal) */
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(44, 62, 80, 0.8); backdrop-filter: blur(3px); }
+        .modal-content { background: white; margin: 8% auto; padding: 0; width: 450px; border-radius: 15px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.3); animation: zoomIn 0.2s; }
+        .card-top { background: var(--primary); color: white; padding: 20px; font-size: 20px; font-weight: bold; }
+        .card-body { padding: 25px; }
+        .detail-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f0f0f0; }
+        .detail-row:last-child { border-bottom: none; }
+        .label { color: #888; font-size: 11px; font-weight: bold; text-transform: uppercase; }
+        .value { color: #333; font-weight: 600; font-size: 15px; }
+        .close-btn { width: 100%; background: #eee; border: none; padding: 15px; font-weight: bold; cursor: pointer; transition: 0.3s; color: #555; }
+        .close-btn:hover { background: #e0e0e0; color: #000; }
+
+        @keyframes zoomIn { from {transform: scale(0.9); opacity: 0;} to {transform: scale(1); opacity: 1;} }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2 style="color: var(--primary);">📡 IT Bağlantı Rehberi</h2>
+    <div class="header-area">
+        <h1>İNTERNET DEVRELERİ ENVANTERİ</h1>
+        <h3>BAĞCILAR BELEDİYESİ BİLGİ İŞLEM MÜDÜRLÜĞÜ</h3>
+    </div>
+
+    <div class="search-container">
+        <input type="text" id="searchInput" class="search-box" onkeyup="filterTable()" placeholder="Birim, Mahalle, Devre No veya IP ile hızlı arama...">
+    </div>
     
-    <table>
+    <table id="envanterTable">
         <thead>
             <tr>
-                <th>BİRİM / MAHALLE</th>
-                <th>DIŞ IP</th>
-                <th>SERVİS SAĞLAYICI</th>
-                <th>DEVRE ADI/NO</th>
+                <th>birim</th>
+                <th>mahalle</th>
+                <th>DEVRE ADI/NUMARASI</th>
+                <th>DIŞ İP</th>
             </tr>
         </thead>
         <tbody id="tableBody">
-            <tr onclick="openCard('SANCAKTEPE', '960. Sokak No:5', '72.16.52.52', 'TÜRKNET', '152635623', 'Pl2024Pl', '100 Mbps', '23.04.2027')">
-                <td><strong>SANCAKTEPE</strong></td>
-                <td style="color: var(--accent); font-weight: bold;">72.16.52.52</td>
-                <td>TÜRKNET</td>
+            <tr onclick="openCard('BİLGİ İŞLEM MÜDÜRLÜĞÜ', 'Merkez Bina', '152635623', '72.16.52.52', 'Modem: 1234 / PPPoE: Pl2024Pl', '100 Mbps', '23.04.2027')">
+                <td>BİLGİ İŞLEM MÜDÜRLÜĞÜ</td>
+                <td>Merkez Bina</td>
                 <td>152635623</td>
+                <td class="ip-text">72.16.52.52</td>
             </tr>
-            <tr onclick="openCard('YAVUZ SELİM', 'Birlik Cd. No:147', '172.16.1.141', 'TÜRK TELEKOM', 'ucanevlerparki...', 'Pl2024Pl', '100/4 Mbps', '04.12.2029')">
-                <td><strong>YAVUZ SELİM</strong></td>
-                <td style="color: var(--accent); font-weight: bold;">172.16.1.141</td>
-                <td>TÜRK TELEKOM</td>
-                <td>ucanevlerparki...</td>
+            <tr onclick="openCard('KÜLTÜR MERKEZİ', 'Sancaktepe', '985632147', '85.62.45.63', 'Modem: Pl2024Pl', '50 Mbps', '10.05.2026')">
+                <td>KÜLTÜR MERKEZİ</td>
+                <td>Sancaktepe</td>
+                <td>985632147</td>
+                <td class="ip-text">85.62.45.63</td>
             </tr>
         </tbody>
     </table>
@@ -60,31 +89,51 @@
 
 <div id="birimModal" class="modal">
     <div class="modal-content">
-        <div id="c-baslik" class="card-header"></div>
-        
-        <div class="detail-row"><span class="detail-label">ADRES:</span> <span id="c-adres" class="detail-value"></span></div>
-        <div class="detail-row"><span class="detail-label">DIŞ IP:</span> <span id="c-ip" class="detail-value"></span></div>
-        <div class="detail-row"><span class="detail-label">SAĞLAYICI:</span> <span id="c-servis" class="detail-value"></span></div>
-        <div class="detail-row"><span class="detail-label">DEVRE NO:</span> <span id="c-devre" class="detail-value"></span></div>
-        <div class="detail-row"><span class="detail-label">HIZ:</span> <span id="c-hiz" class="detail-value"></span></div>
-        <div class="detail-row"><span class="detail-label">ŞİFRE:</span> <span id="c-sifre" class="detail-value" style="color: var(--success);"></span></div>
-        <div class="detail-row"><span class="detail-label">TAAHHÜT BİTİŞ:</span> <span id="c-tarih" class="detail-value"></span></div>
-        
-        <button class="close-btn" onclick="closeCard()">Kapat</button>
-        <div style="clear:both;"></div>
+        <div id="m-birim" class="card-top"></div>
+        <div class="card-body">
+            <div class="detail-row"><span class="label">Mahalle/Konum:</span> <span id="m-mahalle" class="value"></span></div>
+            <div class="detail-row"><span class="label">Devre No:</span> <span id="m-devre" class="value"></span></div>
+            <div class="detail-row"><span class="label">Dış IP Adresi:</span> <span id="m-ip" class="value"></span></div>
+            <div class="detail-row"><span class="label">Sistem Şifreleri:</span> <span id="m-sifre" class="value" style="color:var(--success)"></span></div>
+            <div class="detail-row"><span class="label">Hat Hızı:</span> <span id="m-hiz" class="value"></span></div>
+            <div class="detail-row"><span class="label">Taahhüt Bitiş:</span> <span id="m-tarih" class="value"></span></div>
+        </div>
+        <button class="close-btn" onclick="closeCard()">KARTATI KAPAT</button>
     </div>
 </div>
 
 <script>
-    function openCard(birim, adres, ip, servis, devre, sifre, hiz, tarih) {
-        document.getElementById('c-baslik').innerText = birim;
-        document.getElementById('c-adres').innerText = adres;
-        document.getElementById('c-ip').innerText = ip;
-        document.getElementById('c-servis').innerText = servis;
-        document.getElementById('c-devre').innerText = devre;
-        document.getElementById('c-sifre').innerText = sifre;
-        document.getElementById('c-hiz').innerText = hiz;
-        document.getElementById('c-tarih').innerText = tarih;
+    function filterTable() {
+        var input, filter, table, tr, td, i, j, txtValue, found;
+        input = document.getElementById("searchInput");
+        filter = input.value.toUpperCase();
+        table = document.getElementById("envanterTable");
+        tr = table.getElementsByTagName("tr");
+
+        for (i = 1; i < tr.length; i++) {
+            td = tr[i].getElementsByTagName("td");
+            found = false;
+            for (j = 0; j < td.length; j++) {
+                if (td[j]) {
+                    txtValue = td[j].textContent || td[j].innerText;
+                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                        found = true;
+                        break;
+                    }
+                }
+            }
+            tr[i].style.display = found ? "" : "none";
+        }
+    }
+
+    function openCard(birim, mahalle, devre, ip, sifre, hiz, tarih) {
+        document.getElementById('m-birim').innerText = birim;
+        document.getElementById('m-mahalle').innerText = mahalle;
+        document.getElementById('m-devre').innerText = devre;
+        document.getElementById('m-ip').innerText = ip;
+        document.getElementById('m-sifre').innerText = sifre;
+        document.getElementById('m-hiz').innerText = hiz;
+        document.getElementById('m-tarih').innerText = tarih;
         document.getElementById('birimModal').style.display = "block";
     }
 
