@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BT Envanter & Taahhüt Takip Sistemi</title>
+    <style>
+        :root { --primary: #2c3e50; --secondary: #3498db; --success: #27ae60; --danger: #e74c3c; --warning: #f1c40f; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; margin: 0; padding: 20px; }
+        .container { max-width: 1400px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+        header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #eee; padding-bottom: 15px; margin-bottom: 20px; }
+        
+        .search-box { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 6px; font-size: 16px; margin-bottom: 20px; }
+        
+        table { width: 100%; border-collapse: collapse; background: white; }
+        th { background: var(--primary); color: white; padding: 12px; text-align: left; position: sticky; top: 0; }
+        td { padding: 12px; border-bottom: 1px solid #eee; font-size: 14px; }
+        tr:hover { background: #f9f9f9; }
+
+        .badge { padding: 4px 8px; border-radius: 4px; color: white; font-size: 11px; font-weight: bold; text-transform: uppercase; }
+        .bg-aktif { background: var(--success); }
+        .bg-pasif { background: #95a5a6; }
+        
+        .taahhut-warning { background-color: #fff3cd !important; border-left: 5px solid var(--warning); }
+        .taahhut-danger { background-color: #f8d7da !important; border-left: 5px solid var(--danger); }
+        
+        .ip-link { color: var(--secondary); text-decoration: none; font-weight: bold; border-bottom: 1px dashed var(--secondary); }
+        .copy-btn { cursor: pointer; margin-left: 5px; font-size: 12px; color: #777; border: 1px solid #ddd; padding: 2px 5px; border-radius: 3px; background: #eee; }
+        
+        .admin-controls { display: none; margin-top: 10px; }
+        .admin-only { display: none; } /* Admin modu kapalıyken gizle */
+        
+        #loginBtn { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; }
+        .btn-add { background: var(--success); color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; margin-bottom: 10px; }
+        .btn-delete { background: var(--danger); color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div>
+            <h1 style="margin:0; color: var(--primary);">🌐 Kurum Envanter Rehberi</h1>
+            <small id="currentDateDisplay"></small>
+        </div>
+        <button id="loginBtn" onclick="toggleAdmin()">🔒 Yönetici Girişi</button>
+    </header>
+
+    <div class="admin-controls" id="adminHeader">
+        <button class="btn-add">➕ Yeni Kayıt Ekle</button>
+        <span style="color: var(--danger); font-weight: bold; margin-left: 15px;">Yönetici Modu Aktif (Ekle/Sil Yetkisi Açık)</span>
+    </div>
+
+    <input type="text" id="searchInput" class="search-box" placeholder="Mahalle, Birim, Devre No veya İp Ara..." onkeyup="searchTable()">
+
+    <table id="inventoryTable">
+        <thead>
+            <tr>
+                <th>MAHALLE / ADRES</th>
+                <th>SERVİS / HIZ</th>
+                <th>DIŞ IP (Tıkla)</th>
+                <th>ŞİFRELER</th>
+                <th>TAAHHÜT BİTİŞ</th>
+                <th>DURUM</th>
+                <th class="admin-only">İŞLEM</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody">
+            <tr data-bitis="2027-04-23">
+                <td><strong>SANCAKTEPE</strong><br><small>960.SOKAK NO 5</small></td>
+                <td>TÜRKNET / ADSL<br><small>100 Mbps</small></td>
+                <td><a href="http://72.16.52.52" target="_blank" class="ip-link">72.16.52.52</a></td>
+                <td>Modem: 123456 <span class="copy-btn" onclick="copyText('123456')">📋</span><br>PPPoE: Pl2024Pl</td>
+                <td>23.04.2027<br><small class="kalan-gun"></small></td>
+                <td><span class="badge bg-aktif">AKTİF</span></td>
+                <td class="admin-only"><button class="btn-delete">Sil</button></td>
+            </tr>
+            <tr data-bitis="2026-05-10">
+                <td><strong>YENİ MAHALLE</strong><br><small>KOÇMAN CD. NO 74</small></td>
+                <td>SUPERBOX / FİBER<br><small>1000 Mbps</small></td>
+                <td><a href="http://85.62.45.63" target="_blank" class="ip-link">85.62.45.63</a></td>
+                <td>Modem: Pl2024Pl <span class="copy-btn" onclick="copyText('Pl2024Pl')">📋</span></td>
+                <td>10.05.2026<br><small class="kalan-gun"></small></td>
+                <td><span class="badge bg-aktif">AKTİF</span></td>
+                <td class="admin-only"><button class="btn-delete">Sil</button></td>
+            </tr>
+            <tr data-bitis="2028-07-25">
+                <td><strong>BARBAROS</strong><br><small>63.SOKAK NO 65</small></td>
+                <td>TÜRK TELEKOM / VDSL<br><small>50 Mbps</small></td>
+                <td><a href="http://192.168.41.52" target="_blank" class="ip-link">192.168.41.52</a></td>
+                <td>Modem: admin <span class="copy-btn" onclick="copyText('admin')">📋</span></td>
+                <td>25.07.2028<br><small class="kalan-gun"></small></td>
+                <td><span class="badge bg-pasif">PASİF</span></td>
+                <td class="admin-only"><button class="btn-delete">Sil</button></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<script>
+    // Bugünün Tarihi (Senin sistemine göre sabitlendi)
+    const T_BUGUN = new Date("2026-04-28");
+    document.getElementById('currentDateDisplay').innerText = "Sistem Tarihi: 28 Nisan 2026";
+
+    // Taahhüt Hesaplama ve Renklendirme
+    function updateDashboard() {
+        const rows = document.querySelectorAll("#tableBody tr");
+        rows.forEach(row => {
+            const bitis = new Date(row.getAttribute("data-bitis"));
+            const farkZamani = bitis - T_BUGUN;
+            const gun = Math.ceil(farkZamani / (1000 * 60 * 60 * 24));
+            
+            const kalanText = row.querySelector(".kalan-gun");
+            if(gun > 0) {
+                kalanText.innerText = gun + " gün kaldı";
+                if(gun <= 30 && gun > 7) row.classList.add("taahhut-warning");
+                if(gun <= 7) row.classList.add("taahhut-danger");
+            } else {
+                kalanText.innerText = "SÜRE DOLDU!";
+                row.classList.add("taahhut-danger");
+            }
+        });
+    }
+
+    // Arama Fonksiyonu
+    function searchTable() {
+        let filter = document.getElementById("searchInput").value.toUpperCase();
+        let rows = document.getElementById("tableBody").getElementsByTagName("tr");
+        for (let i = 0; i < rows.length; i++) {
+            rows[i].style.display = rows[i].innerText.toUpperCase().includes(filter) ? "" : "none";
+        }
+    }
+
+    // Admin Panelini Aç/Kapat
+    function toggleAdmin() {
+        let sifre = prompt("Yönetici Şifresini Girin:");
+        if(sifre === "1234") { // Burayı kendi şifrenle değiştir
+            document.getElementById("adminHeader").style.display = "block";
+            document.querySelectorAll(".admin-only").forEach(el => el.style.display = "table-cell");
+            document.getElementById("loginBtn").innerText = "🔓 Yönetici Çıkışı";
+            alert("Yönetici modu aktif. Kayıt silebilir veya ekleyebilirsiniz.");
+        } else {
+            alert("Hatalı şifre!");
+        }
+    }
+
+    // Kopyalama Fonksiyonu
+    function copyText(text) {
+        navigator.clipboard.writeText(text);
+        alert("Kopyalandı: " + text);
+    }
+
+    window.onload = updateDashboard;
+</script>
+
+</body>
+</html>
