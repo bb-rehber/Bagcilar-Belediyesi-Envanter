@@ -124,6 +124,12 @@
 
     function closeCard() { document.getElementById('birimModal').style.display = "none"; }
     window.onclick = function(event) { if (event.target == document.getElementById('birimModal')) closeCard(); }
+    function cihazaGit() {
+    var ip = document.getElementById('m-ip').innerText;
+    if (ip && ip !== "") {
+        window.open('http://' + ip, '_blank');
+    }
+}
 </script>
 
 </body>
