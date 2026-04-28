@@ -4,10 +4,11 @@
     <meta charset="UTF-8">
     <title>İnternet Devreleri Envanteri</title>
     <style>
-        ::root { 
-    --primary: #1e3799;    /* Daha canlı bir lacivert */
-    --accent: #0097e6;     /* Bağcılar mavisi tonları */
-    --success: #44bd32;    /* Durum Yeşili */
+        <style>
+:root { 
+    --primary: #1e3799;    /* Bağcılar Kurumsal Lacivert */
+    --accent: #0097e6;     /* Canlı Mavi */
+    --success: #44bd32;    /* Aktif Hattın Yeşili */
     --bg: #f1f2f6; 
 }
 
@@ -19,8 +20,18 @@ body {
     padding: 20px;
     color: #333;
 }
-        .container { max-width: 1200px; margin: auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border-top: 5px solid var(--primary); }
-        
+
+.container { 
+    max-width: 1200px; 
+    margin: 40px auto; 
+    background: white; 
+    padding: 30px; 
+    border-radius: 16px; 
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1); 
+    border-top: 6px solid var(--primary); 
+}
+
+/* Kurumsal Başlık */
         /* Kurumsal Başlık */
         .header-area { text-align: center; margin-bottom: 30px; border-bottom: 1px solid #eee; padding-bottom: 20px; }
         .header-area h1 { margin: 0; color: var(--primary); font-size: 24px; text-transform: uppercase; }
@@ -30,26 +41,141 @@ body {
         .search-box { width: 100%; padding: 15px 25px; border: 2px solid #e0e0e0; border-radius: 30px; font-size: 16px; outline: none; margin-bottom: 25px; transition: 0.3s; }
         .search-box:focus { border-color: var(--accent); }
 
-        /* Ana Tablo (Senin Seçtiğin 4 Başlık) */
-        table { width: 100%; border-collapse: collapse; }
-        th { background: #f1f3f5; color: #495057; padding: 15px; text-align: left; border: 1px solid #dee2e6; font-size: 12px; text-transform: uppercase; }
-        td { padding: 15px; border: 1px solid #dee2e6; font-size: 14px; cursor: pointer; }
-        tr:hover td { background-color: #f8fbff; }
-        .ip-text { color: var(--accent); font-weight: bold; font-family: monospace; }
+        /* 2.1: Tablo Yapısı (Satırları birbirinden ayırdık) */
+table { 
+    width: 100%; 
+    border-collapse: separate; 
+    border-spacing: 0 10px; /* Satırlar arası boşluk */
+    margin-top: 15px;
+}
 
-        /* Birim Kartı (Modal) */
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(44, 62, 80, 0.8); backdrop-filter: blur(3px); }
-        .modal-content { background: white; margin: 5% auto; width: 500px; border-radius: 15px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.3); animation: zoomIn 0.2s; }
-        .card-top { background: var(--primary); color: white; padding: 20px; font-size: 18px; font-weight: bold; }
-        .card-body { padding: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .detail-item { border-bottom: 1px solid #f0f0f0; padding-bottom: 5px; }
-        .label { color: #888; font-size: 10px; font-weight: bold; text-transform: uppercase; display: block; }
-        .value { color: #333; font-weight: 600; font-size: 14px; word-break: break-all; }
-        .full-width { grid-column: span 2; }
-        .close-btn { width: 100%; background: #f8f9fa; border: none; padding: 15px; font-weight: bold; cursor: pointer; color: #555; border-top: 1px solid #eee; }
-        .close-btn:hover { background: #e0e0e0; }
+/* 2.2: Başlıklar (Daha sade ve kurumsal) */
+th { 
+    background: transparent; 
+    color: #57606f; 
+    padding: 10px 20px; 
+    text-align: left; 
+    font-size: 11px; 
+    text-transform: uppercase; 
+    letter-spacing: 1px;
+    border: none;
+}
 
-        @keyframes zoomIn { from {transform: scale(0.95); opacity: 0;} to {transform: scale(1); opacity: 1;} }
+/* 2.3: Birim Satırları (Kart Görünümü) */
+td { 
+    padding: 18px 20px; 
+    background: #ffffff; 
+    border-top: 1px solid #f1f2f6;
+    border-bottom: 1px solid #f1f2f6;
+    font-size: 14px;
+    transition: all 0.3s ease; 
+}
+
+/* 2.4: Kart Köşelerini Yuvarlatma */
+td:first-child { border-left: 1px solid #f1f2f6; border-radius: 12px 0 0 12px; font-weight: 600; color: var(--primary); }
+td:last-child { border-right: 1px solid #f1f2f6; border-radius: 0 12px 12px 0; }
+
+/* 2.5: Üzerine Gelince Canlanma (Mouse Hover) */
+tr:not(thead tr):hover td { 
+    background-color: #ffffff; 
+    transform: translateY(-3px); /* Satırı yukarı kaldırır */
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08); /* Altına gölge atar */
+    cursor: pointer;
+}
+
+/* 2.6: IP Yazısını Belirginleştirme */
+.ip-text { 
+    color: var(--accent); 
+    font-weight: bold; 
+    font-family: 'Courier New', monospace;
+    background: #eef2f7;
+    padding: 4px 8px;
+    border-radius: 6px;
+}
+
+        /* 3.1: Modal Arka Planı (Daha şık bir karartma) */
+.modal { 
+    display: none; 
+    position: fixed; 
+    z-index: 1000; 
+    left: 0; top: 0; 
+    width: 100%; height: 100%; 
+    background: rgba(15, 25, 45, 0.85); /* Daha koyu ve premium bir lacivert cam efekti */
+    backdrop-filter: blur(6px); /* Arkayı hafifçe bulanıklaştırır */
+}
+
+/* 3.2: Kart Tasarımı */
+.modal-content { 
+    background: white; 
+    margin: 5% auto; 
+    width: 550px; 
+    border-radius: 24px; 
+    overflow: hidden; 
+    box-shadow: 0 25px 50px rgba(0,0,0,0.4); 
+    animation: zoomIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); 
+}
+
+/* 3.3: Kartın Üst Kısmı (Gradient Başlık) */
+.card-top { 
+    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%); 
+    color: white; 
+    padding: 30px; 
+    font-size: 20px; 
+    font-weight: bold;
+    text-align: center;
+    letter-spacing: 1px;
+}
+
+/* 3.4: Kart İçindeki Veriler */
+.card-body { 
+    padding: 25px; 
+    display: grid; 
+    grid-template-columns: 1fr 1fr; 
+    gap: 20px; 
+    background: #fdfdfd;
+}
+
+.detail-item { 
+    border-bottom: 1px solid #f1f2f6; 
+    padding-bottom: 8px; 
+}
+
+.label { 
+    color: #a0a0a0; 
+    font-size: 11px; 
+    font-weight: 700; 
+    text-transform: uppercase; 
+    margin-bottom: 4px;
+    display: block; 
+}
+
+.value { 
+    color: #2d3436; 
+    font-weight: 600; 
+    font-size: 15px; 
+}
+
+/* 3.5: Kapat Butonu */
+.close-btn { 
+    width: 100%; 
+    background: #f8f9fa; 
+    border: none; 
+    padding: 20px; 
+    font-weight: bold; 
+    cursor: pointer; 
+    color: #636e72; 
+    transition: 0.3s;
+}
+
+.close-btn:hover { 
+    background: #fab1a0; /* Hafif bir kırmızı tonu */
+    color: #d63031;
+}
+
+@keyframes zoomIn { 
+    from {transform: scale(0.85); opacity: 0;} 
+    to {transform: scale(1); opacity: 1;} 
+}
     </style>
 </head>
 <body>
